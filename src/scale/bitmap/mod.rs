@@ -2,12 +2,13 @@
 
 #![allow(dead_code)]
 
-mod png;
-
 /// Decodes a PNG image.
 pub fn decode_png(data: &[u8], scratch: &mut Vec<u8>, target: &mut [u8]) -> Option<(u32, u32)> {
-    png::decode(data, scratch, target)
-        .map(|(w, h, _)| (w, h))
+    tiny_skia::Pixmap::decode_png(data)
+        .map(|pixmap| {
+            target.copy_from_slice(pixmap.data());
+            (pixmap.width(), pixmap.height())
+        })
         .ok()
 }
 

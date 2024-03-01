@@ -714,41 +714,11 @@ impl<'a> Scaler<'a> {
         image.data.resize(bufsize, 0);
         self.state.scratch0.clear();
         self.state.scratch1.clear();
-        let mut w = bitmap.width;
-        let mut h = bitmap.height;
+        let w = bitmap.width;
+        let h = bitmap.height;
         let scale = size / bitmap.ppem as f32;
-        image.placement = if size != 0. && scale != 1. {
-            self.state
-                .scratch0
-                .resize(bitmap.format.buffer_size(w, h), 0);
-            w = (w as f32 * scale) as u32;
-            h = (h as f32 * scale) as u32;
-            image.data.resize(bitmap.format.buffer_size(w, h), 0);
-            if !bitmap.decode(Some(&mut self.state.scratch1), &mut self.state.scratch0) {
-                return None;
-            }
-            if !bitmap::resize(
-                &self.state.scratch0,
-                bitmap.width,
-                bitmap.height,
-                bitmap.format.channels(),
-                &mut image.data,
-                w,
-                h,
-                bitmap::Filter::Mitchell,
-                Some(&mut self.state.scratch1),
-            ) {
-                return None;
-            }
-            let left = (bitmap.left as f32 * scale) as i32;
-            let top = (bitmap.top as f32 * scale) as i32;
-            Placement {
-                left,
-                top,
-                width: w,
-                height: h,
-            }
-        } else {
+        image.scale = scale;
+        image.placement = {
             image.data.resize(bitmap.format.buffer_size(w, h), 0);
             if !bitmap.decode(Some(&mut self.state.scratch1), &mut image.data) {
                 return None;

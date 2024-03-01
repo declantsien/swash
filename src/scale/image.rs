@@ -31,6 +31,7 @@ pub struct Image {
     pub content: Content,
     /// Offset and size of the image.
     pub placement: Placement,
+    pub scale: f32,
     /// Raw image data.
     pub data: Vec<u8>,
 }
@@ -38,7 +39,9 @@ pub struct Image {
 impl Image {
     /// Creates a new empty scaled image.
     pub fn new() -> Self {
-        Self::default()
+        let mut image = Self::default();
+        image.scale = 1.0;
+        image
     }
 
     /// Resets the image to a default state.
